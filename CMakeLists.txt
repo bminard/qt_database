@@ -32,9 +32,6 @@ endif (DOXYGEN_FOUND)
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# Find the QSql library
-find_package(Qt5Sql CONFIG REQUIRED)
-
 include_directories(SYSTEM "/usr/local/opt/qt/include")
 
 # Populate a CMake variable with the sources
@@ -42,10 +39,21 @@ set(SOURCE_FILES
     database.cc
 )
 
-# Tell CMake to create the executable
-add_executable(database ${SOURCE_FILES})
-target_link_libraries(database
+add_library (example ${SOURCE_FILES})
+target_link_libraries(example
+    PUBLIC Qt5::Core
     PUBLIC Qt5::Sql
+)
+
+# Find the required library
+find_package(Qt5Core CONFIG REQUIRED)
+find_package(Qt5Sql CONFIG REQUIRED)
+
+# Tell CMake to create the executable
+add_executable(database main.cc)
+target_link_libraries(database
+    PUBLIC Qt5::Core
+    PUBLIC example
 )
 
 # Download and unpack googletest at configure time
@@ -75,9 +83,10 @@ include_directories("${gtest_SOURCE_DIR}/include")
 enable_testing()
 
 include(GoogleTest)
-add_executable(t_database t_database.cc)
+add_executable(t_database t_database.cc database.cc)
 add_test(t_database t_database)
 target_link_libraries(t_database
     PRIVATE gtest_main
+    PUBLIC example
 )
 gtest_discover_tests(t_database)

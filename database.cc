@@ -7,13 +7,14 @@
 #include <QSqlError>
 #include <QSqlQuery>
 
-int main()
-{
+#include "database.h"
+
+void create(const QString &db_path) {
     const QString DRIVER("QSQLITE");
     if(QSqlDatabase::isDriverAvailable(DRIVER)) {
         QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
 
-        db.setDatabaseName(":memory:");
+        db.setDatabaseName(db_path);
 
         if(!db.open()) {
             qWarning() << "MainWindow::DatabaseConnect - ERROR: " << db.lastError().text();
