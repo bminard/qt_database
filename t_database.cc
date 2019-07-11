@@ -26,6 +26,30 @@ private:
     const char * const file_name_template;
 };
 
+class FileManager
+{
+public:
+    FileManager(const FileTemplateManager& t): file_name_template(t) {
+        file_name = new char[strlen(file_name_template.get_template()) + 1];
+        strcpy(file_name, file_name_template.get_template());
+        mktemp(file_name);
+    }
+
+    const char * const get_name() const {
+        return file_name;
+    }
+
+    ~FileManager() {
+        if(std::remove(file_name) != 0)
+            std::perror( "Error deleting file" );
+        delete file_name;
+    }
+
+private:
+    FileTemplateManager file_name_template;
+    char *file_name;
+};
+
 const bool fileExists(const QString& path) {
     QFileInfo check_file(path);
     if (check_file.exists() && check_file.isFile()) {
@@ -37,8 +61,8 @@ const bool fileExists(const QString& path) {
 /* Check container state following initialization using default constructor.
  */
 TEST(TestDatabase, Create) {
-    FileTemplateManager test_file_path("/tmp/database.XXXXXX");;
-    QString database(test_file_path.get_template());
+    FileManager test_file_path(FileTemplateManager("/tmp/database.XXXXXX"));
+    QString database(test_file_path.get_name());
 
     create(database);
     ASSERT_TRUE(fileExists(database));
