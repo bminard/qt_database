@@ -32,6 +32,11 @@ endif (DOXYGEN_FOUND)
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+# Find the QSql library
+find_package(Qt5Sql CONFIG REQUIRED)
+
+include_directories(SYSTEM "/usr/local/opt/qt/include")
+
 # Populate a CMake variable with the sources
 set(SOURCE_FILES
     database.cc
@@ -40,6 +45,7 @@ set(SOURCE_FILES
 # Tell CMake to create the executable
 add_executable(database ${SOURCE_FILES})
 target_link_libraries(database
+    PUBLIC Qt5::Sql
 )
 
 # Download and unpack googletest at configure time
