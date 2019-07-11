@@ -7,31 +7,12 @@
 
 namespace {
 
-class FileTemplateManager
-{
-public:
-    FileTemplateManager(const char * const t): file_name_template(t) {
-        if(!file_name_template)
-           throw "file template error";
-    }
-
-    ~FileTemplateManager() {
-    }
-
-    const char *get_template() const {
-        return file_name_template;
-    }
-
-private:
-    const char * const file_name_template;
-};
-
 class FileManager
 {
 public:
-    FileManager(const FileTemplateManager& t): file_name_template(t) {
-        file_name = new char[strlen(file_name_template.get_template()) + 1];
-        strcpy(file_name, file_name_template.get_template());
+    FileManager(const char * const t) {
+        file_name = new char[strlen(t) + 1];
+        strcpy(file_name, t);
         mktemp(file_name);
     }
 
@@ -46,7 +27,6 @@ public:
     }
 
 private:
-    FileTemplateManager file_name_template;
     char *file_name;
 };
 
@@ -61,7 +41,7 @@ const bool fileExists(const QString& path) {
 /* Check container state following initialization using default constructor.
  */
 TEST(TestDatabase, Create) {
-    FileManager test_file_path(FileTemplateManager("/tmp/database.XXXXXX"));
+    FileManager test_file_path("/tmp/database.XXXXXX");
     QString database(test_file_path.get_name());
 
     create(database);
