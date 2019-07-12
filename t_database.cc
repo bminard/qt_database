@@ -111,6 +111,34 @@ TEST_F(TestDatabase, DatabaseConnection) {
     ASSERT_TRUE(fileExists(database) and fileEmpty(database));
 }
 
+/*! @brief Test database fixture for database connections.
+ */
+class TestDatabaseConnection
+    : public TestDatabase
+{
+protected:
+    /*! @brief Generate the test database name and path.
+     */
+    TestDatabaseConnection()
+        : TestDatabase()
+    {
+    }
+
+    /*! @brief Ensure test cases satisfy all preconditons.
+     */
+    void SetUp() {
+        Database::connect(database);
+        ASSERT_TRUE(fileExists(database));
+    }
+};
+
+/* Check database initialization.
+ */
+TEST_F(TestDatabaseConnection, DatabaseInitialization) {
+    Database::init();
+    ASSERT_TRUE(not fileEmpty(database));
+}
+
 } // namespace
 
 int main(int argc, char **argv) {

@@ -27,3 +27,15 @@ void Database::connect(const QString &path) {
         qWarning() << "connect - ERROR: no driver " << DRIVER << " available";
     }
 }
+
+
+/*! @brief Initialize the database.
+ * @note Call this function only if the database needs to be created from
+ *      scratch (i.e., is empty).
+ */
+void Database::init() {
+	QSqlQuery query("CREATE TABLE people (id INTEGER PRIMARY KEY, name TEXT)");
+
+	if(!query.isActive())
+		qWarning() << "MainWindow::DatabaseInit - ERROR: " << query.lastError().text();
+}
