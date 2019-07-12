@@ -14,4 +14,5 @@ int main()
     else {
         // Future home of database migrations.
     }
+    Database::populate();
 }

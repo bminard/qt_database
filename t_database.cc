@@ -91,13 +91,13 @@ protected:
 
     /*! @brief Ensure test cases satisfy all preconditons.
      */
-    void SetUp() {
+    void SetUp() override {
         ASSERT_FALSE(fileExists(database));
     }
 
     /*! @brief Ensure test cases satisfy all postconditions.
      */
-    void TearDown() {
+    void TearDown() override {
         ASSERT_TRUE(fileExists(database));
     }
 
@@ -126,9 +126,16 @@ protected:
 
     /*! @brief Ensure test cases satisfy all preconditons.
      */
-    void SetUp() {
+    void SetUp() override {
+        TestDatabase::SetUp();
         Database::connect(database);
         ASSERT_TRUE(fileExists(database));
+    }
+
+    /*! @brief Ensure test cases satisfy all postconditions.
+     */
+    void TearDown() override {
+        TestDatabase::TearDown();
     }
 };
 
@@ -137,6 +144,40 @@ protected:
 TEST_F(TestDatabaseConnection, DatabaseInitialization) {
     Database::init();
     ASSERT_TRUE(not fileEmpty(database));
+}
+
+/*! @brief Test database fixture for database initialization.
+ */
+class TestDatabaseInitialize
+    : public TestDatabaseConnection
+{
+protected:
+    /*! @brief Generate the test database name and path.
+     */
+    TestDatabaseInitialize()
+        : TestDatabaseConnection()
+    {
+    }
+
+    /*! @brief Ensure test cases satisfy all preconditons.
+     */
+    void SetUp() override {
+        TestDatabaseConnection::SetUp();
+        Database::init();
+        ASSERT_TRUE(not fileEmpty(database));
+    }
+
+    /*! @brief Ensure test cases satisfy all postconditions.
+     */
+    void TearDown() override {
+        TestDatabaseConnection::TearDown();
+    }
+};
+
+/* Populate database.
+ */
+TEST_F(TestDatabaseInitialize, DatabasePopulate) {
+    Database::populate();
 }
 
 } // namespace

@@ -39,3 +39,12 @@ void Database::init() {
 	if(!query.isActive())
 		qWarning() << "MainWindow::DatabaseInit - ERROR: " << query.lastError().text();
 }
+
+/*! @brief Populate the database.
+ */
+void Database::populate() {
+	QSqlQuery query;
+
+	if(!query.exec("INSERT INTO people(name) VALUES('Eddie Guerrero')"))
+		qWarning() << "MainWindow::DatabasePopulate - ERROR: " << query.lastError().text();
+}
