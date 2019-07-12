@@ -50,6 +50,18 @@ private:
     char *file_name; //! The temporary file's name.
 };
 
+/* @brief Determine if the file is empty.
+ * @param path is the path to a file
+ * @return true iff file is empty (zero length); false otherwise
+ */
+const bool fileEmpty(const QString path) {
+    QFileInfo check_file(path);
+    if (check_file.exists() and 0 == check_file.size()) {
+        return true;
+    }
+    return false;
+}
+
 /* @brief Determine if a file exists.
  * @param path is the path to a file
  * @return true if file exists; false otherwise
@@ -62,14 +74,41 @@ const bool fileExists(const QString& path) {
     return false;
 }
 
-/* Check container state following initialization using default constructor.
+/*! @brief Test database fixture.
  */
-TEST(TestDatabase, Create) {
-    FileManager test_file_path("/tmp/database.XXXXXX"); // At least one 'X' must appear in the test file path.
-    QString database(test_file_path.get_name());
+class TestDatabase
+    : public ::testing::Test
+    , public FileManager
+{
+protected:
+    /*! @brief Generate the test database name and path.
+     */
+    TestDatabase()
+        : FileManager("/tmp/database.XXXXXX")
+        , database(get_name())
+    {
+    }
 
-    create(database);
-    ASSERT_TRUE(fileExists(database));
+    /*! @brief Ensure test cases satisfy all preconditons.
+     */
+    void SetUp() {
+        ASSERT_FALSE(fileExists(database));
+    }
+
+    /*! @brief Ensure test cases satisfy all postconditions.
+     */
+    void TearDown() {
+        ASSERT_TRUE(fileExists(database));
+    }
+
+    const QString database; //! The full file system path to the test database.
+};
+
+/* Check database connection.
+ */
+TEST_F(TestDatabase, DatabaseConnection) {
+    Database::connect(database);
+    ASSERT_TRUE(fileExists(database) and fileEmpty(database));
 }
 
 } // namespace

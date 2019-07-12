@@ -1,4 +1,7 @@
 #include <QString>
 
-void create(const QString&);
+namespace Database {
 
+void connect(const QString&);
+
+} // name space

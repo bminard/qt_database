@@ -1,7 +1,10 @@
+#include <QFileInfo>
+
 #include "database.h"
 
 int main()
 {
-    create("test.db");
-}
+    QString db_path("test.db");
 
+    Database::connect(db_path);
+}

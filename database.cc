@@ -12,7 +12,7 @@
 /*! @brief Create an SQLite database.
  * @param path the path to the database
  */
-void create(const QString &path) {
+void Database::connect(const QString &path) {
     const QString DRIVER("QSQLITE");
     if(QSqlDatabase::isDriverAvailable(DRIVER)) {
         QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
@@ -20,10 +20,10 @@ void create(const QString &path) {
         db.setDatabaseName(path);
 
         if(!db.open()) {
-            qWarning() << "create - ERROR: " << db.lastError().text();
+            qWarning() << "connect - ERROR: " << db.lastError().text();
         }
     }
     else {
-        qWarning() << "create - ERROR: no driver " << DRIVER << " available";
+        qWarning() << "connect - ERROR: no driver " << DRIVER << " available";
     }
 }
