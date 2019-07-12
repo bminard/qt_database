@@ -7,4 +7,4 @@ See his Article at [How to embed a database in your application with SQLite and 
 Davide's source code at [GitHub](https://github.com/vivaladav/BitsOfBytes/blob/master/howto-embed-database-in-application-with-sqlite-and-qt/QtSqlExample/MainWindow.cpp).
 
 No real advantage to this code over what Davide published.
-This implementation doesn't use the Qt application window code, so is arguable a little more simpler.
+This implementation doesn't use the Qt application window code, so is arguably a little more simpler.
