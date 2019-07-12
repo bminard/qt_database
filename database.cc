@@ -9,18 +9,21 @@
 
 #include "database.h"
 
-void create(const QString &db_path) {
+/*! @brief Create an SQLite database.
+ * @param path the path to the database
+ */
+void create(const QString &path) {
     const QString DRIVER("QSQLITE");
     if(QSqlDatabase::isDriverAvailable(DRIVER)) {
         QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
 
-        db.setDatabaseName(db_path);
+        db.setDatabaseName(path);
 
         if(!db.open()) {
-            qWarning() << "MainWindow::DatabaseConnect - ERROR: " << db.lastError().text();
+            qWarning() << "create - ERROR: " << db.lastError().text();
         }
     }
     else {
-        qWarning() << "MainWindow::DatabaseConnect - ERROR: no driver " << DRIVER << " available";
+        qWarning() << "create - ERROR: no driver " << DRIVER << " available";
     }
 }
