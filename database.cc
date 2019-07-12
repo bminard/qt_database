@@ -1,6 +1,3 @@
-// Example from Davide Coppola. Article at http://blog.davidecoppola.com/2016/11/howto-embed-database-in-application-with-sqlite-and-qt/.
-// See https://github.com/vivaladav/BitsOfBytes/blob/master/howto-embed-database-in-application-with-sqlite-and-qt/QtSqlExample/MainWindow.cpp
-
 #include <QDebug>
 #include <QSqlDatabase>
 #include <QSqlDriver>
