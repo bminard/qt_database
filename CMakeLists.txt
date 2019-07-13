@@ -37,6 +37,7 @@ include_directories(SYSTEM "/usr/local/opt/qt/include")
 # Populate a CMake variable with the sources
 set(SOURCE_FILES
     database.cc
+    schema.cc
 )
 
 add_library (example ${SOURCE_FILES})
@@ -83,6 +84,7 @@ include_directories("${gtest_SOURCE_DIR}/include")
 enable_testing()
 
 include(GoogleTest)
+
 add_executable(t_database t_database.cc database.cc)
 add_test(t_database t_database)
 target_link_libraries(t_database
@@ -90,3 +92,11 @@ target_link_libraries(t_database
     PUBLIC example
 )
 gtest_discover_tests(t_database)
+
+add_executable(t_schema t_schema.cc)
+add_test(t_schema t_schema)
+target_link_libraries(t_schema
+    PRIVATE gtest_main
+    PUBLIC example
+)
+gtest_discover_tests(t_schema)
