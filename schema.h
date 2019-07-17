@@ -27,7 +27,7 @@ public:
 protected:
     /*! @brief Construct the database schema object.
      */
-    Schema() noexcept { }
+    Schema() noexcept;
 };
 
 /*! @brief Extend the Schema interface to a single table revision.
@@ -44,9 +44,11 @@ public:
     typedef const char *sql_statement_type;
 
     /*! @brief Construct the query defining the revised table structure.
-     * @param q an SQL statement
+     * @param s an SQL statement
      */
-    TableRevision(sql_statement_type s): sql_statement(s) {
+    TableRevision(sql_statement_type s)
+        : sql_statement(s)
+    {
     }
 
     /*! @brief Destructor for the table revision object.
@@ -59,7 +61,33 @@ public:
     virtual const bool migrate();
 
 private:
-    sql_statement_type sql_statement;
+    sql_statement_type sql_statement; // The SQL statement used to revise the table structure.
+};
+
+/*! @brief Extend the Schema interface to a collection of table revisions.
+ *
+ * The TableRevisionHistory provides the interface used to manage the table
+ * revision history. It contains a collection of table structure revisions (see
+ * the TableRevision class) which when executed together update (or create) the
+ * table to it's current structure. It fulfills the requirements of the
+ * *Composite* component in the Composite design pattern.
+ */
+class TableRevisionHistory
+    : public Schema
+{
+public:
+    typedef Schema* value_type; // Schema container value type.
+    typedef std::vector<value_type> container_type; //! Schema container type.
+
+    virtual ~TableRevisionHistory();
+    virtual const bool migrate() override;
+    virtual void add(value_type);
+
+protected:
+    TableRevisionHistory();
+
+private:
+    container_type revision_history;
 };
 
 } // name space

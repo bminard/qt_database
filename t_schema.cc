@@ -8,6 +8,11 @@ namespace {
 
 using Database::Schema;
 using Database::TableRevision;
+using Database::TableRevisionHistory;
+
+/*******************************************************************************
+ * Schema class tests.
+ ******************************************************************************/
 
 /*! @brief Wrapper for Schema class to enable the Schema constructor to be called.
  */
@@ -55,6 +60,10 @@ protected:
 TEST_F(SchemaTestFixture, Migrate) {
     ASSERT_EQ(true, s->migrate());
 }
+
+/*******************************************************************************
+ * TableRvision class tests.
+ ******************************************************************************/
 
 /*! @brief Create a list of SQL statements to test the TableRevision with.
  */
@@ -112,6 +121,73 @@ TEST_F(TestDatabase, MirgrateFails) {
 TEST_F(TestDatabase, MirgratePasses) {
     TableRevision r("CREATE TABLE people (id INTEGER PRIMARY KEY, name TEXT)");
     ASSERT_TRUE(r.migrate());
+}
+
+/*******************************************************************************
+ * TableRvision class tests.
+ ******************************************************************************/
+
+/*! @brief Test the TableRevisionHistory class.
+ */
+class TableHistory
+    : public TableRevisionHistory
+{
+public:
+    /*! @brief Create the table history object.
+     */
+    TableHistory()
+        : TableRevisionHistory() { }
+
+    /*! @brief Destroy the table history object.
+     */
+    ~TableHistory() { }
+};
+
+TEST(TableRevisionTest, Constructor) {
+    ASSERT_NO_THROW(TableHistory history);
+}
+
+class TableRevisionTestFixture
+    : public ::testing::Test
+{
+protected:
+
+    void SetUp() {
+        history = new TableHistory;
+    }
+
+    void TearDown() {
+        delete history;
+    }
+
+   TableHistory *history;
+};
+
+TEST_F(TableRevisionTestFixture, MigrateWhenNoHistoryExists) {
+    ASSERT_TRUE(history->migrate());
+}
+
+class Table
+    : public TableRevision
+{
+public:
+    typedef TableRevision::sql_statement_type sql_statement_type;
+
+    Table(sql_statement_type s)
+        : TableRevision(s) { }
+
+    ~Table() { }
+};
+
+TEST_F(TableRevisionTestFixture, Add) {
+    Table *revision = new Table("CREATE TABLE people (id INTEGER PRIMARY KEY, name TEXT)");
+    ASSERT_NO_THROW(history->add(revision));
+}
+
+TEST_F(TableRevisionTestFixture, MigrateOne) {
+    Table *revision = new Table("CREATE TABLE people (id INTEGER PRIMARY KEY, name TEXT)");
+    ASSERT_NO_THROW(history->add(revision));
+    ASSERT_TRUE(history->migrate());
 }
 
 } // namespace
