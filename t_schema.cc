@@ -1,4 +1,7 @@
 #include "gtest/gtest.h"
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QVariant>
 
 #include "database.h"
 #include "file_management.h"
@@ -201,6 +204,27 @@ TEST_F(TableRevisionTestFixture, MigrateOne) {
     Table *revision = new Table("CREATE TABLE people (id INTEGER PRIMARY KEY, name TEXT)");
     ASSERT_NO_THROW(history->add(revision));
     ASSERT_TRUE(history->migrate(database));
+}
+
+TEST_F(TableRevisionTestFixture, MigrateTwo) {
+    Table *revision0 = new Table("CREATE TABLE people (id INTEGER PRIMARY KEY, name TEXT)");
+    Table *revision1 = new Table("INSERT INTO people(name) VALUES('Eddie Guerrero')");
+    ASSERT_NO_THROW(history->add(revision0));
+    ASSERT_NO_THROW(history->add(revision1));
+    ASSERT_TRUE(history->migrate(database));
+
+    QSqlQuery query;
+    query.prepare("SELECT name FROM people WHERE name = (:name)");
+    const QVariant s(QString("Eddie Guerrero"));
+    query.bindValue(":name", s);
+    if (query.exec()) {
+       if (query.next()) {
+          ASSERT_TRUE(1);
+       }
+       else {
+          ASSERT_TRUE(0);
+       }
+    }
 }
 
 } // namespace
