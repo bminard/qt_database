@@ -5,8 +5,6 @@
 
 #include "database.h"
 
-namespace Database {
-
 /*! @brief Class interface to the whole-part heirarchy of the database schema.
  * @note The application should use this class to manage all database migrations.
  *
@@ -88,7 +86,5 @@ protected:
 private:
     container_type revision_history;
 };
-
-} // name space
 
 #endif // _SCHEMA_H_

@@ -9,10 +9,6 @@
 
 namespace {
 
-using Database::Schema;
-using Database::TableRevision;
-using Database::TableRevisionHistory;
-
 /*******************************************************************************
  * Schema tests.
  ******************************************************************************/
@@ -36,7 +32,7 @@ public:
 
 protected:
     const QString database_name; //! The full file system path to the test database.
-    Database::Database database; //! The database to use in the tests.
+    Database database; //! The database to use in the tests.
 };
 
 /*! @brief Wrapper for Schema to enable the Schema constructor to be tested.
@@ -52,7 +48,7 @@ public:
 
     /*! @brief Perform a migration on the empty schema.
      */
-    const bool migrate(Database::Database&) {
+    const bool migrate(Database&) {
         return true;
     }
 };

@@ -7,7 +7,7 @@
 
 #include "database.h"
 
-const QString Database::Database::DRIVER("QSQLITE"); //! The SQLite database driver.
+const QString Database::DRIVER("QSQLITE"); //! The SQLite database driver.
 
 /*! @brief Open the named database using the provided connection name.
  * @param database_name the name of the database to open.
@@ -19,7 +19,7 @@ const QString Database::Database::DRIVER("QSQLITE"); //! The SQLite database dri
  * use by the application whenever the application connects to the database
  * using the connection name.
  */
-Database::Database::Database(const QString& database_name, const QString& connection_name)
+Database::Database(const QString& database_name, const QString& connection_name)
     : connection_name(connection_name)
 {
     if(not QSqlDatabase::isDriverAvailable(DRIVER)) {
@@ -37,7 +37,7 @@ Database::Database::Database(const QString& database_name, const QString& connec
  *
  * This method removes the database's connection name from the list of avaiable databases.
  */
-Database::Database::~Database()
+Database::~Database()
 {
     QSqlDatabase::removeDatabase(connection_name);
 }
@@ -47,49 +47,8 @@ Database::Database::~Database()
  * @note SQLite must execute one SQL statement at a time.
  * @return true if the query completes successfully; false otherwise
  */
-const bool Database::Database::execute(const QString& sql_statement) {
+const bool Database::execute(const QString& sql_statement) {
     QSqlDatabase db = QSqlDatabase::database(connection_name); 
     QSqlQuery query(db);     
     return query.exec(sql_statement);
-}
-
-/*--- Legacy ---*/
-
-/*! @brief Create an SQLite database.
- * @param path the path to the database
- */
-void Database::connect(const QString& path) {
-    const QString DRIVER("QSQLITE");
-    if(QSqlDatabase::isDriverAvailable(DRIVER)) {
-        QSqlDatabase db = QSqlDatabase::addDatabase(DRIVER);
-
-        db.setDatabaseName(path);
-
-        if(!db.open()) {
-            qWarning() << "connect - ERROR: " << db.lastError().text();
-        }
-    }
-    else {
-        qWarning() << "connect - ERROR: no driver " << DRIVER << " available";
-    }
-}
-
-/*! @brief Initialize the database.
- * @note Call this function only if the database needs to be created from
- *      scratch (i.e., is empty).
- */
-void Database::init() {
-	QSqlQuery query("CREATE TABLE people (id INTEGER PRIMARY KEY, name TEXT)");
-
-	if(!query.isActive())
-		qWarning() << "MainWindow::DatabaseInit - ERROR: " << query.lastError().text();
-}
-
-/*! @brief Populate the database.
- */
-void Database::populate() {
-	QSqlQuery query;
-
-	if(!query.exec("INSERT INTO people(name) VALUES('Eddie Guerrero')"))
-		qWarning() << "MainWindow::DatabasePopulate - ERROR: " << query.lastError().text();
 }

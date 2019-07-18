@@ -3,10 +3,6 @@
 
 #include "schema.h"
 
-using Database::Schema;
-using Database::TableRevision;
-using Database::TableRevisionHistory;
-
 /*! @brief Constuctor for the database schema object.
  */
 Schema::Schema() noexcept {
