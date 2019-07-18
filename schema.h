@@ -3,13 +3,15 @@
 
 #include <vector>
 
+#include "database.h"
+
 namespace Database {
 
 /*! @brief Class interface to the whole-part heirarchy of the database schema.
  * @note The application should use this class to manage all database migrations.
  *
  * The Schema provides the interface used to initiate a database migration. It
- * can be a table reiviosn or a collection of tables (and their revisions). It
+ * can be a table revision or a collection of tables (and their revisions). It
  * fulfills the requirements of the *Composite* component in the Composite
  * design pattern.
  */
@@ -22,7 +24,7 @@ public:
 
     /*! @brief Carry out database migration from revision \f$n\f$ to \f$n + 1, n > 0\f$.
      */
-    virtual const bool migrate() = 0;
+    virtual const bool migrate(Database&) = 0;
 
 protected:
     /*! @brief Construct the database schema object.
@@ -55,10 +57,7 @@ public:
      */
     ~TableRevision() { }
 
-    /*! @brief Carry out table migration from revision \f$n\f$ to revision \f$n + 1\f$.
-     * @returns true iff the migration succeeds; false otherwise
-     */
-    virtual const bool migrate();
+    virtual const bool migrate(Database&) override;
 
 private:
     sql_statement_type sql_statement; // The SQL statement used to revise the table structure.
@@ -80,7 +79,7 @@ public:
     typedef std::vector<value_type> container_type; //! Schema container type.
 
     virtual ~TableRevisionHistory();
-    virtual const bool migrate() override;
+    virtual const bool migrate(Database&) override;
     virtual void add(value_type);
 
 protected:

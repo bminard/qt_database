@@ -11,10 +11,32 @@ using Database::TableRevision;
 using Database::TableRevisionHistory;
 
 /*******************************************************************************
- * Schema class tests.
+ * Schema tests.
  ******************************************************************************/
 
-/*! @brief Wrapper for Schema class to enable the Schema constructor to be called.
+/*! @brief Construct the test database.
+ */
+class TestDatabase
+    : public DatabaseFileName
+{
+public:
+    TestDatabase() 
+        : DatabaseFileName()
+        , database_name(get_name())
+        , database(database_name)
+    {
+    }
+
+    ~TestDatabase()
+    {
+    }
+
+protected:
+    const QString database_name; //! The full file system path to the test database.
+    Database::Database database; //! The database to use in the tests.
+};
+
+/*! @brief Wrapper for Schema to enable the Schema constructor to be tested.
  */
 class EmptySchema
     : public Schema 
@@ -27,7 +49,7 @@ public:
 
     /*! @brief Perform a migration on the empty schema.
      */
-    const bool migrate() {
+    const bool migrate(Database::Database&) {
         return true;
     }
 };
@@ -40,6 +62,7 @@ TEST(TestSchema, Constructor) {
  */
 class SchemaTestFixture
     : public ::testing::Test
+    , public TestDatabase
 {
 protected:
     /*! @brief Set up the schema object.
@@ -58,14 +81,14 @@ protected:
 };
 
 TEST_F(SchemaTestFixture, Migrate) {
-    ASSERT_EQ(true, s->migrate());
+    ASSERT_EQ(true, s->migrate(database));
 }
 
 /*******************************************************************************
- * TableRvision class tests.
+ * TableRevision class tests.
  ******************************************************************************/
 
-/*! @brief Create a list of SQL statements to test the TableRevision with.
+/*! @brief A list of SQL statements to test the TableRevision with.
  */
 class SQLStatementTestFixture
     : public ::testing::TestWithParam<TableRevision::sql_statement_type>
@@ -84,47 +107,36 @@ INSTANTIATE_TEST_SUITE_P(
 
 /*! @brief Test database fixture.
  */
-class TestDatabase
+class TestDatabaseFixture
     : public ::testing::Test
-    , public DatabaseFileName
+    , public TestDatabase
 {
 protected:
-    /*! @brief Generate the test database name and path.
-     */
-    TestDatabase()
-        : DatabaseFileName()
-        , database(get_name())
-    {
-    }
-
     /*! @brief Ensure test cases satisfy all preconditons.
      */
     void SetUp() override {
-        Database::connect(database);
-        ASSERT_TRUE(fileExists(database));
+        ASSERT_TRUE(fileExists(database_name));
     }
 
     /*! @brief Ensure test cases satisfy all postconditions.
      */
     void TearDown() override {
-        ASSERT_TRUE(fileExists(database));
+        ASSERT_TRUE(fileExists(database_name));
     }
-
-    const QString database; //! The full file system path to the test database.
 };
 
-TEST_F(TestDatabase, MirgrateFails) {
+TEST_F(TestDatabaseFixture, MirgrateFails) {
     TableRevision r("");
-    ASSERT_FALSE(r.migrate());
+    ASSERT_FALSE(r.migrate(database));
 }
 
-TEST_F(TestDatabase, MirgratePasses) {
+TEST_F(TestDatabaseFixture, MirgratePasses) {
     TableRevision r("CREATE TABLE people (id INTEGER PRIMARY KEY, name TEXT)");
-    ASSERT_TRUE(r.migrate());
+    ASSERT_TRUE(r.migrate(database));
 }
 
 /*******************************************************************************
- * TableRvision class tests.
+ * TableRevisionHistory class tests.
  ******************************************************************************/
 
 /*! @brief Test the TableRevisionHistory class.
@@ -149,6 +161,7 @@ TEST(TableRevisionTest, Constructor) {
 
 class TableRevisionTestFixture
     : public ::testing::Test
+    , public TestDatabase
 {
 protected:
 
@@ -164,7 +177,7 @@ protected:
 };
 
 TEST_F(TableRevisionTestFixture, MigrateWhenNoHistoryExists) {
-    ASSERT_TRUE(history->migrate());
+    ASSERT_TRUE(history->migrate(database));
 }
 
 class Table
@@ -187,7 +200,7 @@ TEST_F(TableRevisionTestFixture, Add) {
 TEST_F(TableRevisionTestFixture, MigrateOne) {
     Table *revision = new Table("CREATE TABLE people (id INTEGER PRIMARY KEY, name TEXT)");
     ASSERT_NO_THROW(history->add(revision));
-    ASSERT_TRUE(history->migrate());
+    ASSERT_TRUE(history->migrate(database));
 }
 
 } // namespace
