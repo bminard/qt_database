@@ -73,8 +73,9 @@ class TableRevisionHistory
     : public Schema
 {
 public:
-    typedef Schema* value_type; // Schema container value type.
-    typedef std::vector<value_type> container_type; //! Schema container type.
+    typedef Schema* value_type; //!< Schema container value type.
+    typedef std::unique_ptr<value_type> pointer_type;  //!< Schema pointer type.
+    typedef std::vector<pointer_type> container_type;  //!< Schema container type.
 
     virtual ~TableRevisionHistory();
     virtual const bool migrate(Database&) override;

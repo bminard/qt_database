@@ -27,7 +27,7 @@ const bool TableRevision::migrate(Database& database) {
  * @param r a schema revision
  */
 void TableRevisionHistory::add(value_type r) {
-    revision_history.push_back(r);
+    revision_history.push_back(std::make_unique<value_type>(r));
 }
 
 /*! @brief Database schema migrator constructor.
@@ -49,8 +49,8 @@ TableRevisionHistory::~TableRevisionHistory() {
  * Migrators are called in the same order they were added to the history.
  */
 const bool TableRevisionHistory::migrate(Database& database) {
-    for(auto structure: revision_history) {
-        if(false == structure->migrate(database)) {
+    for(auto const& structure: revision_history) {
+        if(false == (*structure)->migrate(database)) {
             return false;
         }
     }
